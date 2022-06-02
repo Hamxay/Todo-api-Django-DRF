@@ -1,0 +1,9 @@
+version: '3.8' # optional since v1.27.0
+services:
+  app:
+    build: .
+    volumes:
+      - .:/django
+    ports:
+      - '8001:8001'
+    container_name: django_container
