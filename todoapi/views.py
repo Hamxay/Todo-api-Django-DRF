@@ -1,17 +1,21 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from . serializer import TodoSerializer, RegisterSerializer
+from . serializer import TodoSerializer, RegisterSerializer, TodoPostSerializer
 from .models import Todo
 from rest_framework.generics import ListAPIView
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.filters import SearchFilter
-from todoapi import serializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.decorators import authentication_classes, permission_classes
 
 # Create your views here.
 
 
 @api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def getAllTodos(request):
     get_all = Todo.objects.all()
     serializer = TodoSerializer(get_all, many=True)
@@ -19,26 +23,21 @@ def getAllTodos(request):
 
 
 @api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def getSingle(request, pk, *args, **kwargs):
     get_all = Todo.objects.get(id=pk)
     serializer = TodoSerializer(get_all)
     return Response(serializer.data)
 
 
-# @api_view(['GET'])
-# def getSearch(request, text):
-#     get_all = Todo.objects.all()
-#     serializer_class = TodoSerializer(get_all, many=True)
-#     filter_backends = [SearchFilter]
-#     search_fields = ['title', 'description']
-#     return Response(serializer_class.data)
-
-
-@swagger_auto_schema("POST", request_body=TodoSerializer, responses={200: TodoSerializer})
-@api_view(['POST'])
+@swagger_auto_schema("PATCH", request_body=TodoPostSerializer, responses={200: TodoSerializer})
+@api_view(['PATCH'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def UpdateTodo(request, pk, *args, **kwargs):
     get_all = Todo.objects.get(id=pk)
-    serializer = TodoSerializer(instance=get_all,  data=request.data)
+    serializer = TodoPostSerializer(instance=get_all,  data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -46,16 +45,24 @@ def UpdateTodo(request, pk, *args, **kwargs):
 
 
 @api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def getDataByUser(request, pk, *args, **kwargs):
     get_all = Todo.objects.filter(user=pk)
     serializer = TodoSerializer(get_all, many=True)
     return Response(serializer.data)
 
 
-@swagger_auto_schema("POST", request_body=TodoSerializer, responses={200: TodoSerializer})
+@swagger_auto_schema("POST", request_body=TodoPostSerializer, responses={200: TodoSerializer})
 @api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def taskCreate(request):
-    serializer = TodoSerializer(data=request.data)
+    current_user = request.user.id
+    data = request.data
+    data['user'] = current_user
+
+    serializer = TodoSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -94,6 +101,8 @@ def register_view(request):
 
 
 class SearchData(ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
     filter_backends = [SearchFilter]

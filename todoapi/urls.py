@@ -4,6 +4,7 @@ from . import views
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from rest_framework.authtoken.views import obtain_auth_token
 
 ...
 
@@ -30,8 +31,7 @@ urlpatterns = [
     path('add_todo', views.taskCreate, name='add_todo'),
     path('delete_todo/<str:pk>', views.RemoveTodo, name='remove todo'),
     path('register', views.register_view, name='register'),
-    path("find_todo/<str:title>/<str:description>",
-         views.search_in_todo, name='find'),
+    path('login', obtain_auth_token, name="Get Token"),
 
     path('get', views.SearchData.as_view(), name='Search Data')
 ]

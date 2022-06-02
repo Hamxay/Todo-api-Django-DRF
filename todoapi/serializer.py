@@ -10,7 +10,13 @@ from rest_framework.validators import UniqueValidator
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
-        fields = '__all__'
+        fields = "__all__"
+
+
+class TodoPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Todo
+        fields = 'title', 'description'
 
 
 class RegisterSerializer(serializers.ModelSerializer):
