@@ -69,20 +69,19 @@ def taskCreate(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# @swagger_auto_schema("GET", request_body=TodoSerializer, responses={200: TodoSerializer})
-@api_view(['GET'])
-def search_in_todo(request, title, description):
-    get_all = Todo.objects.filter(title=title, description=description)
-    serializer = TodoSerializer(get_all, many=True)
-    return Response(serializer.data)
-
-
 @api_view(['DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def RemoveTodo(request, pk):
+    current_user = request.user.id
     get_all = Todo.objects.get(id=pk)
     serializer = TodoSerializer(get_all)
-    get_all.delete()
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    user_id = get_all.user.id
+
+    if(current_user == user_id):
+        get_all.delete()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response({"Error": "Can't allow to delete this todo"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema("POST", request_body=RegisterSerializer, responses={200: RegisterSerializer})
