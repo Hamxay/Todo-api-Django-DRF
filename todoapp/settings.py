@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-b$_^oinr=&s(u@((m(7_-@90mr_tlexf9!n!bt60$2^mrbe-mp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'todoapi',
     'rest_framework',
     'rest_framework.authtoken',
-    # 'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
     'drf_yasg',
 
 ]

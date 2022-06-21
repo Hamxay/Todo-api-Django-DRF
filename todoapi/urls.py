@@ -20,10 +20,8 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path(r'^swagger(?P<format>\.json|\.yaml)$',
-         schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    path('', schema_view.with_ui('swagger',
-                                 cache_timeout=0), name='schema-swagger-ui'),
+    path('docs', schema_view.with_ui('swagger',
+                                     cache_timeout=0), name='schema-swagger-ui'),
 
     path('get/<str:pk>', views.GetSingle.as_view(), name='get_single'),
     path('get_by_user<str:pk>', views.GetTodoByUserId.as_view(), name='get_by_user'),
